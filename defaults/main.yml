@@ -6,3 +6,13 @@ restic_archive: "{{ restic_url | basename }}"
 restic_data_dir: /data/services/restic
 restic_bin_dir: /usr/local/bin
 restic_archive_dir: /data/work
+
+restic_version: 0.8.3
+
+restic_url: "{{ restic_versions[restic_version].url }}"
+restic_checksum: "{{ restic_versions[restic_version].checksum }}"
+
+restic_versions:
+  "0.8.3":
+    url: https://github.com/restic/restic/releases/download/v0.8.3/restic_0.8.3_linux_amd64.bz2
+    checksum: sha256:1e9aca80c4f4e263c72a83d4333a9dac0e24b24e1fe11a8dc1d9b38d77883705
