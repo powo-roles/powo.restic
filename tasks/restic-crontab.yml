@@ -1,0 +1,13 @@
+---
+
+# daily backup
+- name: crontab
+  copy:
+    dest: /etc/cron.d/{{ restic_name }}-restic
+    mode: u=rw,g=r,o=r
+    content: |
+      MAILTO={{ restic_email_to }}
+      MAILFROM={{ restic_email_from }}
+      PATH=/usr/bin:/bin:/usr/sbin:/sbin:{{ restic_bin_dir }}
+
+      {{ restic_crontab }} root "{{ restic_bin_dir }}/{{ restic_name }}-restic"

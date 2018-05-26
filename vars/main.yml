@@ -1,0 +1,11 @@
+---
+
+required_vars:
+  - restic_name
+  - restic_email_from
+  - restic_email_to
+  - restic_crontab
+  - restic_checksum
+  - restic_password_file
+  - restic_bin_dir
+  - restic_data_dir

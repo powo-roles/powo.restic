@@ -1,0 +1,13 @@
+---
+
+- import_tasks: restic-install.yml
+  tags:
+    - restic-install
+
+- import_tasks: restic-script.yml
+  tags:
+    - restic-script
+
+- import_tasks: restic-crontab.yml
+  tags:
+    - restic-crontab

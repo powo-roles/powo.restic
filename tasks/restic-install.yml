@@ -1,0 +1,45 @@
+---
+
+# lockfile-progs is provided by epel
+- include_role:
+    name: geerlingguy.repo-epel
+
+# lockfile-{create,touch} is used to ensure backup is accessed by only
+# one process
+- name: lockfile-progs
+  with_items:
+    - lockfile-progs
+  package:
+    name: "{{ item }}"
+
+- name: bunzip2
+  package:
+    name: bzip2
+
+- name: tools
+  file:
+    path: "{{ restic_archive_dir }}"
+    state: directory
+
+- name: download
+  get_url:
+    url: "{{ restic_url }}"
+    dest: "{{ restic_archive_dir }}/{{ restic_archive }}"
+    checksum: "{{ restic_checksum }}"
+  register: download
+
+- name: check restic
+  stat:
+    path: "{{ restic_bin_dir }}/restic"
+  check_mode: false
+  register: stat_restic
+
+- name: bunzip2
+  shell: bunzip2 -c -k {{ restic_archive_dir }}/{{ restic_archive | quote }} > "{{ restic_bin_dir }}/restic"
+  when: download.changed or not stat_restic.stat.exists
+
+- name: restic file mode
+  file:
+    path: "{{ restic_bin_dir }}/restic"
+    state: file
+    mode: u=rwx,g=rx,o=rx

@@ -1,0 +1,34 @@
+---
+
+- name: cronie
+  service:
+    name: crond
+    state: started
+    enabled: true
+
+- name: restic repositories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ restic_data_dir }}"
+    - "{{ restic_data_dir }}/credentials"
+
+- name: password file
+  copy:
+    dest: "{{ restic_password_file }}"
+    content: |
+      {{ restic_password }}
+    mode: u=r,g=,o=
+
+- name: restic script
+  template:
+    src: restic
+    dest: "{{ restic_bin_dir }}/{{ restic_name }}-restic"
+    mode: u=rwx,g=rx,o=rx
+
+- name: restic openrc config
+  template:
+      src: openrc
+      dest: "{{ restic_object_storage_openrc_conf }}"
+      mode: u=rwx,g=,o=

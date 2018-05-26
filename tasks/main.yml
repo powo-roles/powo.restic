@@ -1,0 +1,11 @@
+---
+
+- name: check required vars
+  with_items: "{{ required_vars }}"
+  when: item is not in vars
+  fail:
+    msg: "{{ item }} not found and is a required var"
+
+- import_tasks: restic.yml
+  become: true
+  become_user: root

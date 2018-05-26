@@ -1,0 +1,8 @@
+---
+
+restic_object_storage_openrc_conf: "{{ restic_data_dir }}/openrc.sh"
+restic_object_storage_protocol: swift
+restic_archive: "{{ restic_url | basename }}"
+restic_data_dir: /data/services/restic
+restic_bin_dir: /usr/local/bin
+restic_archive_dir: /data/work
