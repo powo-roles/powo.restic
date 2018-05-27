@@ -30,5 +30,5 @@
 - name: restic openrc config
   template:
       src: openrc
-      dest: "{{ restic_object_storage_openrc_conf }}"
+      dest: "{{ restic_os_openrc_conf }}"
       mode: u=rwx,g=,o=
