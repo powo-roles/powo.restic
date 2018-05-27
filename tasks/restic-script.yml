@@ -32,3 +32,23 @@
       src: restic.conf
       dest: "{{ restic_conf }}"
       mode: u=rwx,g=,o=
+
+- name: restic prune · script
+  copy:
+    dest: /usr/local/bin/restic-{{ restic_name }}-prune
+    mode: ugo+x
+    content: |
+      #! /bin/bash
+      source {{ restic_data_dir | quote }}/restic.conf
+      restic prune
+
+- name: restic prune · cron
+  when: restic_prune_cron is defined
+  copy:
+    dest: /etc/cron.d/restic-{{ restic_name }}-prune
+    mode: u=rw,g=r,o=r
+    content: |
+      MAILTO={{ restic_email_to | quote }}
+      PATH=/usr/bin:/bin:/usr/sbin:/sbin:{{ restic_bin_dir | quote }}
+
+      restic_prune_crontab root /usr/local/bin/restic-{{ restic_name | quote }}-prune
