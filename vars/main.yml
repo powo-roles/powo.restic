@@ -1,11 +1,37 @@
 ---
 
 required_vars:
+  # installation related
+  - restic_version
+  - restic_bin_dir
+  - restic_data_dir
+  - restic_url
+  - restic_checksum
+  # backup related
+  - restic_src
   - restic_name
+  - restic_protocol
+  - restic_password
+  - restic_lock_file
+  - restic_password_file
+  # cron related
   - restic_email_from
   - restic_email_to
   - restic_crontab
-  - restic_checksum
-  - restic_password_file
-  - restic_bin_dir
-  - restic_data_dir
+
+protocol_required_vars: "{{ _protocol_required_vars[restic_protocol] }}"
+
+_protocol_required_vars:
+  s3: "{{ required_s3_vars }}"
+  swift: "{{ required_swift_vars }}"
+
+required_s3_vars:
+  - restic_s3_user
+  - restic_s3_password
+  - restic_s3_url
+  - restic_s3_container
+
+required_swift_vars:
+  - restic_os_user
+  - restic_os_password
+  - restic_os_container

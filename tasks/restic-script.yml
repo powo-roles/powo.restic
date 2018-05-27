@@ -27,8 +27,8 @@
     dest: "{{ restic_bin_dir }}/{{ restic_name }}-restic"
     mode: u=rwx,g=rx,o=rx
 
-- name: restic openrc config
+- name: restic config
   template:
-      src: openrc
-      dest: "{{ restic_os_openrc_conf }}"
+      src: restic.conf
+      dest: "{{ restic_conf }}"
       mode: u=rwx,g=,o=

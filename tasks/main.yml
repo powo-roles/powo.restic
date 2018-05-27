@@ -6,6 +6,12 @@
   fail:
     msg: "{{ item }} not found and is a required var"
 
+- name: check protocol required vars
+  with_items: "{{ protocol_required_vars }}"
+  when: item is not in vars
+  fail:
+    msg: "{{ item }} not found and is a required var for protocol {{ restic_protocol }}"
+
 - import_tasks: restic.yml
   become: true
   become_user: root

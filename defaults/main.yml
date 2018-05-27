@@ -1,6 +1,6 @@
 ---
 
-restic_os_openrc_conf: "{{ restic_data_dir }}/openrc.sh"
+restic_conf: "{{ restic_data_dir }}/restic.conf"
 restic_protocol: swift
 restic_archive: "{{ restic_url | basename }}"
 restic_data_dir: /data/services/restic
@@ -11,6 +11,8 @@ restic_version: 0.8.3
 
 restic_url: "{{ restic_versions[restic_version].url }}"
 restic_checksum: "{{ restic_versions[restic_version].checksum }}"
+
+restic_s3_url: https://s3.amazonaws.com
 
 restic_versions:
   "0.8.3":
