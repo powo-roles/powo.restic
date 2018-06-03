@@ -1,6 +1,10 @@
 ---
 
 - name: cronie
+  package:
+    name: cronie
+
+- name: cronie service
   service:
     name: crond
     state: started
