@@ -4,7 +4,7 @@ set -e
 
 name={{ restic_name | quote }}
 lock_file={{ restic_lock_file | quote }}
-backuped_dir={{ restic_src | quote }}
+backuped_dirs={{ restic_src | quote }}
 
 restic_conf={{ restic_conf | quote }}
 
@@ -29,7 +29,7 @@ lockfile_touch=$!
 #
 
 source ${restic_conf}
-restic backup "${backuped_dir}"
+restic backup ${backuped_dirs}
 sleep 10
 restic forget --keep-hourly 3 --keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75
 
