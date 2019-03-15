@@ -7,7 +7,7 @@ restic_data_dir: /data/services/restic
 restic_bin_dir: /usr/local/bin
 restic_archive_dir: /data/work
 
-restic_version: 0.8.3
+restic_version: 0.9.4
 
 restic_url: "{{ restic_versions[restic_version].url }}"
 restic_checksum: "{{ restic_versions[restic_version].checksum }}"
