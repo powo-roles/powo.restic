@@ -6,15 +6,10 @@
 
 # lockfile-{create,touch} is used to ensure backup is accessed by only
 # one process
-- name: lockfile-progs
-  with_items:
-    - lockfile-progs
+- name: packages install
   package:
-    name: "{{ item }}"
-
-- name: bunzip2
-  package:
-    name: bzip2
+    name: "{{ restic_utils_packages }}"
+    state: present
 
 - name: tools
   file:

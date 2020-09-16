@@ -27,7 +27,7 @@
 
 - name: restic script
   template:
-    src: restic
+    src: "{{ restic_script_template }}"
     dest: "{{ restic_bin_dir }}/{{ restic_name }}-restic"
     mode: u=rwx,g=rx,o=rx
 

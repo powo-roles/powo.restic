@@ -1,0 +1,37 @@
+#! /bin/bash
+
+set -e
+
+name={{ restic_name | quote }}
+lock_file={{ restic_lock_file | quote }}
+backuped_dirs={{ restic_src | quote }}
+
+restic_conf={{ restic_conf | quote }}
+
+{% raw %}
+
+if ! which restic > /dev/null || [ ! -x "$( which restic )" ]; then
+  echo "FATAL - command restic not found"
+  exit 1
+fi
+
+if ! exec {lock_fd}>${lock_file}; then
+  echo "FATAL - File Descriptor for ${lock_file} was unavailable"
+  echo "FATAL - ensure that ${lock_file} exists and is available"
+  exit 1
+fi
+
+if ! flock -n "$lock_fd"; then
+  echo "FATAL - ${name} backup is currently locked"
+  echo "FATAL - ensure that no ${name} backup is running and erase ${lock_file}"
+  exit 1
+fi
+
+source ${restic_conf}
+restic backup ${backuped_dirs}
+sleep 10
+restic forget --keep-hourly 3 --keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75
+
+flock -u "$lock_fd"
+
+{% endraw %}

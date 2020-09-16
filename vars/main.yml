@@ -35,3 +35,21 @@ required_swift_vars:
   - restic_os_user
   - restic_os_password
   - restic_os_container
+
+restic_script_template: "{{ _restic_script_remplate | distro(vars) }}"
+
+_restic_script_remplate:
+  CentOS_7: restic
+  CentOS_8: restic-flock
+  Debian: restic-flock
+
+restic_utils_packages: "{{ _restic_utils_packages | distro(vars) }}"
+
+_restic_utils_packages:
+  CentOS_7:
+    - bzip2
+    - lockfile-progs
+  CentOS_8:
+    - bzip2
+  Debian:
+    - bzip2
