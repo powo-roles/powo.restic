@@ -1,5 +1,12 @@
 #! /bin/bash
 
+if [ ! -r {{ restic_conf | quote }} ]; then
+  echo "Configuration file "{{ restic_conf | quote }}" is missing"
+  exit $UNKNOWN;
+fi
+
+source {{ restic_conf | quote }}
+
 OK=0
 WARNING=1
 CRITICAL=2
