@@ -63,6 +63,12 @@
     dest: /usr/local/bin/check-restic-consistency
     mode: ugo+x
 
+- name: restic check · script
+  template:
+    src: check-restic
+    dest: /usr/local/bin/check-restic
+    mode: ugo+x
+
 - name: restic prune · cron
   when: restic_prune_crontab is defined
   copy:
