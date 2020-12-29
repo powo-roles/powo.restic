@@ -1,6 +1,7 @@
 ---
 
 restic_conf: "{{ restic_data_dir }}/restic.conf"
+rclone_conf: "{{ restic_data_dir }}/rclone.conf"
 restic_protocol: swift
 restic_archive: "{{ restic_url | basename }}"
 restic_data_dir: /data/services/restic

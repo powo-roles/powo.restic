@@ -2,7 +2,9 @@
 
 - name: cronie
   package:
-    name: cronie
+    name:
+      - cronie
+      - rclone
 
 - name: cronie service
   service:
@@ -37,6 +39,15 @@
       dest: "{{ restic_conf }}"
       mode: u=rwx,g=,o=
 
+- name: rclone config
+  copy:
+      content:
+        [swift]
+        type = swift
+        env_auth = true
+      dest: "{{ rclone_conf }}"
+      mode: u=rwx,g=,o=
+
 - name: restic prune · script
   copy:
     dest: /usr/local/bin/restic-{{ restic_name }}-prune
@@ -45,6 +56,12 @@
       #! /bin/bash
       source {{ restic_data_dir | quote }}/restic.conf
       restic prune
+
+- name: restic check consistency · script
+  copy:
+    src: check-restic-consistency
+    dest: /usr/local/bin/check-restic-consistency
+    mode: ugo+x
 
 - name: restic prune · cron
   when: restic_prune_crontab is defined

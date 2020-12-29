@@ -1,0 +1,68 @@
+#! /bin/bash
+
+OK=0
+WARNING=1
+CRITICAL=2
+UNKNOWN=3
+
+if [ ! which rclone ]; then
+  echo "rclone command is missing"
+  exit $UNKNOWN;
+fi
+if [ -z "${RCLONE_REPOSITORY}" ]; then
+  echo "Missing repository name"
+  exit $UNKNOWN;
+fi
+
+MY_DIR="$( mktemp --suffix "_check" -d )"
+ITERATION=5
+CHECK_FILE="$MY_DIR/check."
+DIFF_FILE="$MY_DIR/diff"
+STDERR_FILE="$MY_DIR/diff"
+
+>&2 echo "Checking ${RCLONE_REPOSITORY}"
+
+if [ -z "$MY_DIR" ]; then
+  echo "Failure initializing temp directory"
+  exit "$UNKNOWN"
+fi
+
+exit_clean_temp() {
+  if [ -z "$DEBUG" -a -n "${MY_DIR}" -a -d "${MY_DIR}" ]; then
+    rm -rf "${MY_DIR}" 2>&1 > /dev/null
+  fi
+  exit $1
+}
+
+if [ -n "$DEBUG" ]; then
+  >&2 echo "Output to $MY_DIR"
+fi;
+
+for i in $( seq $ITERATION ); do
+  { rclone lsf --files-only -R ${RCLONE_REPOSITORY} | sort | uniq; } 1> "$CHECK_FILE$i" 2> "$STDERR_FILE"
+  if [ ${PIPESTATUS[0]} -ne 0 ]; then
+    echo "Error listing repository ${RCLONE_REPOSITORY}"
+    cat $STDERR_FILE
+    exit_clean_temp "$UNKNOWN"
+  fi
+done
+
+status=0
+for i in $( seq 2 $ITERATION); do
+  diff -Nru "${CHECK_FILE}1" "${CHECK_FILE}$i" >> "$DIFF_FILE" 2>> "$STDERR_FILE"
+  (( status = $? | $status ))
+done
+
+if [ $status -eq 0 ]; then
+  echo "No inconsistency found in ${RCLONE_REPOSITORY}"
+elif [ $status -eq 1 ]; then
+  echo "Inconsistencies found in ${RCLONE_REPOSITORY}"
+  cat "$DIFF_FILE"
+  status=$CRITICAL
+else
+  echo "Error comparing files"
+  cat "$STDERR_FILE"
+  status=$UNKNOWN
+fi
+
+exit_clean_temp $status
