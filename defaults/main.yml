@@ -22,3 +22,6 @@ restic_versions:
   "0.9.4":
     url: https://github.com/restic/restic/releases/download/v0.9.4/restic_0.9.4_linux_amd64.bz2
     checksum: sha256:0440b6c1c17b58563c729fa133896199406f29356329ca5d048e4d9dcbf7d6fe
+  "0.11.0":
+    url: https://github.com/restic/restic/releases/download/v0.11.0/restic_0.11.0_linux_amd64.bz2
+    checksum: sha256:f559e774c91f1201ffddba74d5758dec8342ad2b50a3bcd735ccb0c88839045c
