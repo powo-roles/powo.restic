@@ -65,7 +65,7 @@
 
 - name: restic check · script
   template:
-    src: check-restic
+    src: check-restic-repo
     dest: /usr/local/bin/check-restic
     mode: ugo+x
 
