@@ -58,7 +58,7 @@
       restic prune
 
 - name: restic check consistency · script
-  copy:
+  template:
     src: check-restic-consistency
     dest: /usr/local/bin/check-restic-consistency
     mode: ugo+x
