@@ -41,7 +41,7 @@
 
 - name: rclone config
   copy:
-      content:
+      content: |
         [swift]
         type = swift
         env_auth = true
