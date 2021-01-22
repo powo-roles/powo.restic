@@ -1,0 +1,18 @@
+#! /bin/bash
+
+lock_file={{ restic_lock_file | quote }}
+source {{ restic_data_dir | quote }}/restic.conf
+
+if ! exec {lock_fd}>${lock_file}; then
+  echo "FATAL - File Descriptor for ${lock_file} was unavailable"
+  echo "FATAL - ensure that ${lock_file} exists and is available"
+  exit 1
+fi
+
+if ! flock -n "$lock_fd"; then
+  echo "FATAL - ${name} backup is currently locked"
+  echo "FATAL - ensure that no ${name} backup is running and erase ${lock_file}"
+  exit 1
+fi
+
+restic -q prune

@@ -1,0 +1,111 @@
+#! /bin/bash
+
+# this common script
+# * init temp dir and OUTPUT_FILE variable (content to send to shinken)
+# * init OK, WARNING, UNKNOWN, CRITICAL statuses
+# * manage a .status and a .lock file to cache recent results and prevent lock
+#   to trigger an immediate error
+# * remaining args $1 and $2 are minage time (before recheck) and
+#   maxlock time (before error)
+# * script must output to ${OUTPUT_FILE}
+# * script must exit with exit_clean_temp $OK|$WARNING|$CRITICAL|UNKNOWN
+
+lock_file={{ restic_lock_file | quote }}
+
+# basic checks
+if [ ! -r {{ restic_conf | quote }} ]; then
+  echo "Configuration file "{{ restic_conf | quote }}" is missing"
+  exit $UNKNOWN
+fi
+if ! exec {lock_fd}>${lock_file}; then
+  echo "File Descriptor for ${lock_file} was unavailable"
+  exit $UNKNOWN
+fi
+mkdir -p {{ restic_data_dir|quote }}
+
+# import config
+source {{ restic_conf | quote }}
+
+# variables and temp files
+OK=0
+WARNING=1
+CRITICAL=2
+UNKNOWN=3
+
+MY_TEMP="$( mktemp --suffix "_check" -d )"
+OUTPUT_FILE="$MY_TEMP/out"
+
+# 23h
+minage=${1:-1380}
+shift
+# 1h inconnu avant erreur
+maxlock=${1:-60}
+cached_status_file={{ restic_data_dir|quote }}"/${check_script}.status"
+lock_status_file={{ restic_data_dir|quote }}"/${check_script}.lock"
+
+clean_temp() {
+  # drop old files
+  if [ -z "$DEBUG" -a -n "${MY_TEMP}" -a -d "${MY_TEMP}" ]; then
+    rm -rf "${MY_TEMP}" 2>&1 > /dev/null
+  fi
+}
+
+# exit management
+exit_clean_temp() {
+  # store result if not unknown
+  if [[ $1 -ne "$UNKNOWN" ]]; then
+    echo $1 > "$cached_status_file"
+    cat "$OUTPUT_FILE" >> "$cached_status_file"
+    rm -f "$lock_status_file"
+  fi
+  # output result
+  cat "$OUTPUT_FILE"
+  # drop old files
+  clean_temp
+  # exit code
+  exit $1
+}
+exit_cached_status() {
+  >&2 echo "Using cached $status"
+  # cached status code is the first line
+  cached_status=$( head -n 1 "$cached_status_file" )
+  # output starts at second line
+  tail -n +2 "$cached_status_file"
+  # drop old files
+  clean_temp
+  # exit
+  exit $cached_status
+}
+
+#
+# {{ restic_data_dir|quote }}/"*.status" is a cache
+# first line: exit code
+# following lines: output
+# if .status < minage: output cached status
+# if locked, create .unknown if absent
+# if locked, .status available and .unknown absent or < maxlock
+# if locked, .unknown > maxlock: si indisponible, erreur
+#
+
+if [ $( find "${cached_status_file}" -mmin -${minage} 2>/dev/null | wc -l ) -eq 1 ]; then
+  # output old result if < minage
+  exit_cached_status
+fi
+
+if ! flock -n "$lock_fd"; then
+  # create file if not exist to keep track of the start of unknown state
+  if [ ! -f "${lock_status_file}" ]; then
+    touch "${lock_status_file}"
+  fi
+  if [ $( find "${cached_status_file}" -mmin -${maxlock} 2>/dev/null | wc -l ) -eq 1 -a -f "${cached_status_file}" ]; then
+    # if unknown for less than maxlock minutes, use cache if available
+    exit_cached_status
+  else
+    # else unknown
+    echo "backup is currently locked" > "$OUTPUT_FILE"
+    exit_clean_temp $UNKNOWN
+  fi
+fi
+
+# delete old status
+rm -f "${cached_status_file}"

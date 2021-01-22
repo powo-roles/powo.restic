@@ -1,21 +1,15 @@
 #! /bin/bash
 
-OK=0
-CRITICAL=2
-UNKNOWN=3
+THIS="$( readlink -f "${BASH_SOURCE[0]}" )"
+DIR="$( dirname "$THIS" )"
+check_script=check-repo
 
-if [ ! -r {{ restic_conf | quote }} ]; then
-  echo "Configuration file "{{ restic_conf | quote }}" is missing"
-  exit $UNKNOWN;
-fi
+source "$DIR/check-restic-common"
 
-source {{ restic_conf | quote }}
-
-restic --no-lock check 2>&1
+restic check 2>&1 > "$OUTPUT_FILE"
 
 if [ $? -eq 0 ]; then
-  exit 0
+  exit_clean_temp $OK
 else
-  # critical
-  exit 2
+  exit_clean_temp $UNKNOWN
 fi

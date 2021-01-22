@@ -49,13 +49,16 @@
       mode: u=rwx,g=,o=
 
 - name: restic prune · script
-  copy:
+  template:
+    src: restic-prune
     dest: /usr/local/bin/restic-{{ restic_name }}-prune
     mode: ugo+x
-    content: |
-      #! /bin/bash
-      source {{ restic_data_dir | quote }}/restic.conf
-      restic -q prune
+
+- name: restic check common · script
+  template:
+    src: check-restic-common
+    dest: /usr/local/bin/check-restic-common
+    mode: ugo+r
 
 - name: restic check consistency · script
   template:
@@ -63,10 +66,16 @@
     dest: /usr/local/bin/check-restic-consistency
     mode: ugo+x
 
-- name: restic check · script
+- name: restic check repo · script
   template:
     src: check-restic-repo
     dest: /usr/local/bin/check-restic-repo
+    mode: ugo+x
+
+- name: restic check age · script
+  template:
+    src: check-restic-age
+    dest: /usr/local/bin/check-restic-age
     mode: ugo+x
 
 - name: restic prune · cron
@@ -79,4 +88,4 @@
       MAILFROM={{ restic_email_from | quote }}
       PATH=/usr/bin:/bin:/usr/sbin:/sbin:{{ restic_bin_dir | quote }}
 
-      {{ restic_prune_crontab }} root /usr/local/bin/restic-{{ restic_name | quote }}-prune | tee -a {{ restic_log_dir|quote }}
+      {{ restic_prune_crontab }} root /usr/local/bin/restic-{{ restic_name | quote }}-prune 2>&1 | tee -a {{ restic_log_dir|quote }}

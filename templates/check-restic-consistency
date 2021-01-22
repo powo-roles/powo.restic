@@ -1,55 +1,41 @@
 #! /bin/bash
 
-if [ ! -r {{ restic_conf | quote }} ]; then
-  echo "Configuration file "{{ restic_conf | quote }}" is missing"
-  exit $UNKNOWN;
-fi
+THIS="$( readlink -f "${BASH_SOURCE[0]}" )"
+DIR="$( dirname "$THIS" )"
+check_script=consistency
 
-source {{ restic_conf | quote }}
+source "$DIR/check-restic-common"
 
-OK=0
-WARNING=1
-CRITICAL=2
-UNKNOWN=3
+ITERATION=5
+CHECK_FILE="$MY_TEMP/check."
+DIFF_FILE="$MY_TEMP/diff"
+STDERR_FILE="$MY_TEMP/stderr"
 
 if ! hash rclone &>/dev/null; then
-  echo "rclone command is missing"
-  exit $UNKNOWN;
+  echo "rclone command is missing" > "${OUTPUT_FILE}"
+  exit_clean_temp $UNKNOWN;
 fi
 if [ -z "${RCLONE_REPOSITORY}" ]; then
-  echo "Missing repository name"
-  exit $UNKNOWN;
+  echo "Missing repository name" > "${OUTPUT_FILE}"
+  exit_clean_temp $UNKNOWN;
 fi
-
-MY_DIR="$( mktemp --suffix "_check" -d )"
-ITERATION=5
-CHECK_FILE="$MY_DIR/check."
-DIFF_FILE="$MY_DIR/diff"
-STDERR_FILE="$MY_DIR/diff"
 
 >&2 echo "Checking ${RCLONE_REPOSITORY}"
 
-if [ -z "$MY_DIR" ]; then
-  echo "Failure initializing temp directory"
-  exit "$UNKNOWN"
+if [ -z "$MY_TEMP" ]; then
+  echo "Failure initializing temp directory" > "${OUTPUT_FILE}"
+  exit_clean_temp "$UNKNOWN"
 fi
 
-exit_clean_temp() {
-  if [ -z "$DEBUG" -a -n "${MY_DIR}" -a -d "${MY_DIR}" ]; then
-    rm -rf "${MY_DIR}" 2>&1 > /dev/null
-  fi
-  exit $1
-}
-
 if [ -n "$DEBUG" ]; then
-  >&2 echo "Output to $MY_DIR"
+  >&2 echo "Output to $MY_TEMP"
 fi;
 
 for i in $( seq $ITERATION ); do
   { rclone lsf --files-only -R ${RCLONE_REPOSITORY} | sort | uniq; } 1> "$CHECK_FILE$i" 2> "$STDERR_FILE"
   if [ ${PIPESTATUS[0]} -ne 0 ]; then
-    echo "Error listing repository ${RCLONE_REPOSITORY}"
-    cat $STDERR_FILE
+    echo "Error listing repository ${RCLONE_REPOSITORY}" > "${OUTPUT_FILE}"
+    cat $STDERR_FILE > "${OUTPUT_FILE}"
     exit_clean_temp "$UNKNOWN"
   fi
 done
@@ -61,14 +47,14 @@ for i in $( seq 2 $ITERATION); do
 done
 
 if [ $status -eq 0 ]; then
-  echo "No inconsistency found in ${RCLONE_REPOSITORY}"
+  echo "No inconsistency found in ${RCLONE_REPOSITORY}" > "${OUTPUT_FILE}"
 elif [ $status -eq 1 ]; then
-  echo "Inconsistencies found in ${RCLONE_REPOSITORY}"
-  cat "$DIFF_FILE"
+  echo "Inconsistencies found in ${RCLONE_REPOSITORY}" > "${OUTPUT_FILE}"
+  cat "$DIFF_FILE" > "${OUTPUT_FILE}"
   status=$CRITICAL
 else
-  echo "Error comparing files"
-  cat "$STDERR_FILE"
+  echo "Error comparing files" > "${OUTPUT_FILE}"
+  cat "$STDERR_FILE" > "${OUTPUT_FILE}"
   status=$UNKNOWN
 fi
 
