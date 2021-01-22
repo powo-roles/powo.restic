@@ -18,7 +18,7 @@
 
 - name: log directory
   file:
-    path: "{{ restic_log_dir }}"
+    path: "{{ restic_log_dir|dirname }}"
     state: directory
 
 - name: logrotate
@@ -26,7 +26,7 @@
     dest: /etc/logrotate.d/restic
     content: |
       # Restic
-      {{ restic_log_dir }}/restic.log {
+      {{ restic_log_dir }} {
          daily
          missingok
          rotate 30
