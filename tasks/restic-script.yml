@@ -55,7 +55,7 @@
     content: |
       #! /bin/bash
       source {{ restic_data_dir | quote }}/restic.conf
-      restic prune
+      restic -q prune
 
 - name: restic check consistency · script
   template:
@@ -79,4 +79,4 @@
       MAILFROM={{ restic_email_from | quote }}
       PATH=/usr/bin:/bin:/usr/sbin:/sbin:{{ restic_bin_dir | quote }}
 
-      {{ restic_prune_crontab }} root /usr/local/bin/restic-{{ restic_name | quote }}-prune
+      {{ restic_prune_crontab }} root /usr/local/bin/restic-{{ restic_name | quote }}-prune | tee -a {{ restic_log_dir|quote }}
