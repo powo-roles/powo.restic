@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# date to add to result so that we can detect cached result
+DATE="$( date '+%Y/%m/%d %H:%M:%S' )"
+
 THIS="$( readlink -f "${BASH_SOURCE[0]}" )"
 DIR="$( dirname "$THIS" )"
 check_script=consistency
@@ -23,7 +26,7 @@ fi
 >&2 echo "Checking ${RCLONE_REPOSITORY}"
 
 if [ -z "$MY_TEMP" ]; then
-  echo "Failure initializing temp directory" > "${OUTPUT_FILE}"
+  echo "$DATE - Failure initializing temp directory" > "${OUTPUT_FILE}"
   exit_clean_temp "$UNKNOWN"
 fi
 
@@ -34,7 +37,7 @@ fi;
 for i in $( seq $ITERATION ); do
   { rclone lsf --files-only -R ${RCLONE_REPOSITORY} | sort | uniq; } 1> "$CHECK_FILE$i" 2> "$STDERR_FILE"
   if [ ${PIPESTATUS[0]} -ne 0 ]; then
-    echo "Error listing repository ${RCLONE_REPOSITORY}" > "${OUTPUT_FILE}"
+    echo "$DATE - Error listing repository ${RCLONE_REPOSITORY}" > "${OUTPUT_FILE}"
     cat $STDERR_FILE > "${OUTPUT_FILE}"
     exit_clean_temp "$UNKNOWN"
   fi
@@ -47,13 +50,13 @@ for i in $( seq 2 $ITERATION); do
 done
 
 if [ $status -eq 0 ]; then
-  echo "No inconsistency found in ${RCLONE_REPOSITORY}" > "${OUTPUT_FILE}"
+  echo "$DATE - No inconsistency found in ${RCLONE_REPOSITORY}" > "${OUTPUT_FILE}"
 elif [ $status -eq 1 ]; then
-  echo "Inconsistencies found in ${RCLONE_REPOSITORY}" > "${OUTPUT_FILE}"
+  echo "$DATE - Inconsistencies found in ${RCLONE_REPOSITORY}" > "${OUTPUT_FILE}"
   cat "$DIFF_FILE" > "${OUTPUT_FILE}"
   status=$CRITICAL
 else
-  echo "Error comparing files" > "${OUTPUT_FILE}"
+  echo "$DATE - Error comparing files" > "${OUTPUT_FILE}"
   cat "$STDERR_FILE" > "${OUTPUT_FILE}"
   status=$UNKNOWN
 fi

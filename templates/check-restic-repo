@@ -1,12 +1,16 @@
 #! /bin/bash
 
+# date to add to result so that we can detect cached result
+DATE="$( date '+%Y/%m/%d %H:%M:%S' )"
+
 THIS="$( readlink -f "${BASH_SOURCE[0]}" )"
 DIR="$( dirname "$THIS" )"
 check_script=check-repo
 
 source "$DIR/check-restic-common"
 
-restic check 2>&1 > "$OUTPUT_FILE"
+echo -n "$DATE " > $OUTPUT_FILE
+restic check 2>&1 >> "$OUTPUT_FILE"
 
 if [ $? -eq 0 ]; then
   exit_clean_temp $OK

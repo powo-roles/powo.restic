@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# date to add to result so that we can detect cached result
+DATE="$( date '+%Y/%m/%d %H:%M:%S' )"
+
 # usage : WARNING_THRESHOLD CRITICAL_THRESHOLD [minage] [maxunknown]
 [ "$#" -lt "2" ] && { echo "UNKNOWN bad arguments: $@"; exit 0; }
 WARNING_THRESHOLD=$1
@@ -23,8 +26,8 @@ SNAPSHOT_TIMESTAMP="$( date -d "${SNAPSHOT_DATE}" '+%s' )"
 NOW_TIMESTAMP="$( date '+%s' )"
 SNAPSHOT_AGE="$(( ( ${NOW_TIMESTAMP} - ${SNAPSHOT_TIMESTAMP} ) / 3600 ))"
 
-[ -z "${SNAPSHOT_AGE}" ] && { echo "UNKNOWN backup age cannot be extracted - ${SNAPSHOT_INFO}" > "${OUTPUT_FILE}"; exit_clean_temp $UNKNOWN; }
-[ "${SNAPSHOT_AGE}" -gt "${CRITICAL_THRESHOLD}" ] && { echo "CRITICAL outdated backup ${SNAPSHOT_AGE} > ${CRITICAL} hours - ${SNAPSHOT_INFO}" > "${OUTPUT_FILE}"; exit_clean_temp $CRITICAL; }
-[ "${SNAPSHOT_AGE}" -gt "${WARNING_THRESHOLD}" ] && { echo "CRITICAL outdated backup ${SNAPSHOT_AGE} > ${WARNING_THRESHOLD} hours - ${SNAPSHOT_INFO}" > "${OUTPUT_FILE}"; exit_clean_temp $WARNING; }
-echo "OK snapshot age ${SNAPSHOT_AGE} hours  - ${SNAPSHOT_INFO}" > "${OUTPUT_FILE}";
+[ -z "${SNAPSHOT_AGE}" ] && { echo "UNKNOWN $DATE - backup age cannot be extracted - ${SNAPSHOT_INFO}" > "${OUTPUT_FILE}"; exit_clean_temp $UNKNOWN; }
+[ "${SNAPSHOT_AGE}" -gt "${CRITICAL_THRESHOLD}" ] && { echo "CRITICAL $DATE - outdated backup ${SNAPSHOT_AGE} > ${CRITICAL} hours - ${SNAPSHOT_INFO}" > "${OUTPUT_FILE}"; exit_clean_temp $CRITICAL; }
+[ "${SNAPSHOT_AGE}" -gt "${WARNING_THRESHOLD}" ] && { echo "CRITICAL $DATE - outdated backup ${SNAPSHOT_AGE} > ${WARNING_THRESHOLD} hours - ${SNAPSHOT_INFO}" > "${OUTPUT_FILE}"; exit_clean_temp $WARNING; }
+echo "OK $DATE - snapshot age ${SNAPSHOT_AGE} hours  - ${SNAPSHOT_INFO}" > "${OUTPUT_FILE}";
 exit_clean_temp $OK;
