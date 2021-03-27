@@ -23,7 +23,7 @@ restic-command() {
 {%- for path in restic_src.split(" ") -%}
   {{ paths.append("--set-path") }}{{ paths.append(path | quote) }}
 {%- endfor %}
-  restic backup {{ paths | join(" ") }} "--files-from=$backuped_dirs_list"
+  restic backup {{ paths | join(" ") }} "--files-from=$backuped_list_file"
 }
 {% endif %}
 
