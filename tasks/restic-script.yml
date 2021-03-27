@@ -35,18 +35,15 @@
 
 - name: restic config
   template:
-      src: restic.conf
-      dest: "{{ restic_conf }}"
-      mode: u=rwx,g=,o=
+    src: restic.conf
+    dest: "{{ restic_conf }}"
+    mode: u=rwx,g=,o=
 
 - name: rclone config
-  copy:
-      content: |
-        [swift]
-        type = swift
-        env_auth = true
-      dest: "{{ rclone_conf }}"
-      mode: u=rwx,g=,o=
+  template:
+    src: rclone.conf
+    dest: "{{ rclone_conf }}"
+    mode: u=rwx,g=,o=
 
 - name: restic prune · script
   template:

@@ -2,14 +2,34 @@
 
 set -e
 
+{# script use either commands to generate a file list, or restic_src  #}
+{# if commands are provided, restic_src is still used to set paths on snapshot  #}
 name={{ restic_name | quote }}
 lock_file={{ restic_lock_file | quote }}
+{% if not (restic_list_commands | default(False, true)) %}
 backuped_dirs={{ restic_src | quote }}
+restic-command() {
+  restic -q backup ${backuped_dirs}
+}
+{% else %}
+backuped_list_file={{ (restic_data_dir, 'restic-list') | path_join | quote }}
+restic-command() {
+  rm -f "${backuped_list_file}"
+{% for command in restic_list_commands %}
+  {{ command }} >> "${backuped_list_file}"
+{% endfor %}
+{# set-path allows to manually set paths variable on snapshot, building from restic-src  #}
+{%- set paths = [] -%}
+{%- for path in restic_src.split(" ") -%}
+  {{ paths.append("--set-path") }}{{ paths.append(path | quote) }}
+{%- endfor %}
+  restic backup {{ paths | join(" ") }} "--files-from=$backuped_dirs_list"
+}
+{% endif %}
 
 restic_conf={{ restic_conf | quote }}
 
 {% raw %}
-
 if ! which restic > /dev/null || [ ! -x "$( which restic )" ]; then
   echo "FATAL - command restic not found"
   exit 1
@@ -28,11 +48,10 @@ if ! flock -n "$lock_fd"; then
 fi
 
 source ${restic_conf}
-restic -q backup ${backuped_dirs}
+restic-command
 sleep 10
 restic -q forget --keep-hourly 3 --keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75
 
 # explicit lock release; script termination also release lock
 flock -u "$lock_fd"
-
 {% endraw %}
