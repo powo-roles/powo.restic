@@ -1,16 +1,32 @@
 ---
 
-- name: cronie
-  package:
-    name:
-      - cronie
-      - rclone
+- block:
+  - name: cronie
+    package:
+      name:
+        - cronie
+        - rclone
 
-- name: cronie service
-  service:
-    name: crond
-    state: started
-    enabled: true
+  - name: cronie service
+    service:
+      name: crond
+      state: started
+      enabled: true
+  when: ansible_distribution == "RedHat"
+
+- block:
+  - name: cron
+    package:
+      name:
+        - cron
+        - rclone
+
+  - name: cronie service
+    service:
+      name: cron
+      state: started
+      enabled: true
+  when: ansible_distribution == "Debian"
 
 - name: restic repositories
   file:
