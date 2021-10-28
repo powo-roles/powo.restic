@@ -18,7 +18,7 @@ check_script=check-age
 source "$DIR/check-restic-common"
 
 # full line
-SNAPSHOT_INFO="$( restic snapshots -c --host "$( hostname )" latest | grep -E '^[a-z0-9]{8,}' )"
+SNAPSHOT_INFO="$( restic snapshots -c --no-lock --host "$( hostname )" latest | grep -E '^[a-z0-9]{8,}' )"
 [ -z "${SNAPSHOT_INFO}" ] && { echo "UNKNOWN backup age cannot be extracted - ${SNAPSHOT_INFO}"; exit 3; }
 # only date
 SNAPSHOT_DATE="$( echo "${SNAPSHOT_INFO}" | grep -o -E '[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}' )"
