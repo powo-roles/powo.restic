@@ -3,7 +3,7 @@
 # lockfile-progs is provided by epel
 - include_role:
     name: geerlingguy.repo-epel
-  when: ansible_distribution == "RedHat"
+  when: ansible_os_family == "RedHat"
 
 # lockfile-{create,touch} is used to ensure backup is accessed by only
 # one process
