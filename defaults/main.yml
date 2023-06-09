@@ -9,7 +9,7 @@ restic_bin_dir: /usr/local/bin
 restic_archive_dir: /data/work
 restic_log_dir: /data/log/restic/restic.log
 
-restic_version: 0.12.0
+restic_version: 0.15.2
 
 restic_url: "{{ restic_versions[restic_version].url }}"
 restic_checksum: "{{ restic_versions[restic_version].checksum }}"
@@ -29,3 +29,6 @@ restic_versions:
   "0.12.0":
     url: https://github.com/restic/restic/releases/download/v0.12.0/restic_0.12.0_linux_amd64.bz2
     checksum: sha256:63d13d53834ea8aa4d461f0bfe32a89c70ec47e239b91f029ed10bd88b8f4b80
+  "0.15.2":
+    url: https://github.com/restic/restic/releases/download/v0.15.2/restic_0.15.2_linux_amd64.bz2
+    checksum: sha256:44ce3367b0b413ad48757de8e2a1f4e2c30137e7cdc77db64906f3eb7087b78f
