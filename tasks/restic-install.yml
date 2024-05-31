@@ -1,41 +1,9 @@
 ---
 
-# lockfile-progs is provided by epel
-- include_role:
-    name: geerlingguy.repo-epel
-  when: ansible_os_family == "RedHat"
-
-# lockfile-{create,touch} is used to ensure backup is accessed by only
-# one process
-- name: packages install
-  package:
-    name: "{{ restic_utils_packages }}"
-    state: present
-
 - name: tools
   file:
     path: "{{ restic_archive_dir }}"
     state: directory
-
-- name: log directory
-  file:
-    path: "{{ restic_log_dir|dirname }}"
-    state: directory
-
-- name: logrotate
-  copy:
-    dest: /etc/logrotate.d/restic
-    content: |
-      # Restic
-      {{ restic_log_dir }} {
-         daily
-         missingok
-         rotate 30
-         compress
-         notifempty
-         create 644 root adm
-         dateext
-      }
 
 - name: download
   get_url:

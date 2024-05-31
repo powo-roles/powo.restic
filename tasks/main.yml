@@ -8,7 +8,7 @@
 
 - name: check protocol required vars
   with_items: "{{ protocol_required_vars }}"
-  when: item is not in vars
+  when: restic_script_enabled and item is not in vars
   fail:
     msg: "{{ item }} not found and is a required var for protocol {{ restic_protocol }}"
 

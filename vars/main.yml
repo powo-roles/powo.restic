@@ -1,12 +1,15 @@
 ---
+required_vars: "{{ install_required_vars + script_required_vars if restic_script_enabled else install_required_vars }}"
 
-required_vars:
+install_required_vars:
   # installation related
   - restic_version
   - restic_bin_dir
   - restic_data_dir
   - restic_url
   - restic_checksum
+
+script_required_vars:
   # backup related
   - restic_src
   - restic_name
@@ -19,7 +22,7 @@ required_vars:
   - restic_email_to
   - restic_crontab
 
-protocol_required_vars: "{{ _protocol_required_vars[restic_protocol] }}"
+protocol_required_vars: "{{ _protocol_required_vars[restic_protocol] if restic_script_enabled else [] }}"
 
 _protocol_required_vars:
   s3: "{{ required_s3_vars }}"

@@ -5,9 +5,11 @@
     - restic-install
 
 - import_tasks: restic-script.yml
+  when: restic_script_enabled
   tags:
     - restic-script
 
 - import_tasks: restic-crontab.yml
+  when: restic_script_enabled
   tags:
     - restic-crontab

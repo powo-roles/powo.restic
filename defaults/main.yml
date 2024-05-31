@@ -1,5 +1,7 @@
 ---
 
+restic_script_enabled: true
+
 restic_conf: "{{ restic_data_dir }}/restic.conf"
 rclone_conf: "{{ restic_data_dir }}/rclone.conf"
 restic_protocol: swift
