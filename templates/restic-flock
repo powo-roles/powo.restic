@@ -50,7 +50,7 @@ fi
 source ${restic_conf}
 restic-command
 sleep 10
-restic -q forget --keep-hourly 3 --keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75
+restic -q forget --keep-tag preserve --keep-hourly 3 --keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75
 
 # explicit lock release; script termination also release lock
 flock -u "$lock_fd"
