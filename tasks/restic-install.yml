@@ -1,4 +1,7 @@
 ---
+- name: bunzip2
+  package:
+    name: bzip2
 
 - name: tools
   file:
