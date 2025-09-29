@@ -10,6 +10,9 @@ restic_data_dir: /data/services/restic
 restic_bin_dir: /usr/local/bin
 restic_archive_dir: /data/work
 restic_log_dir: /data/log/restic/restic.log
+# use timer instead of cron
+restic_timer: false
+restic_unit_name: restic
 
 restic_version: 0.17.3
 

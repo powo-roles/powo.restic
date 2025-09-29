@@ -20,7 +20,6 @@ script_required_vars:
   # cron related
   - restic_email_from
   - restic_email_to
-  - restic_crontab
 
 protocol_required_vars: "{{ _protocol_required_vars[restic_protocol] if restic_script_enabled else [] }}"
 

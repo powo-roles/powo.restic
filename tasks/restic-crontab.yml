@@ -11,3 +11,4 @@
       PATH=/usr/bin:/bin:/usr/sbin:/sbin:{{ restic_bin_dir }}
 
       {{ restic_crontab }} root "{{ restic_bin_dir }}/{{ restic_name }}-restic" 2>&1 | tee -a {{ restic_log_dir|quote }}
+  when: restic_crontab | default('', true) != ''
