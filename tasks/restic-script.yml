@@ -1,10 +1,5 @@
 ---
 
-# lockfile-progs is provided by epel
-- include_role:
-    name: geerlingguy.repo-epel
-  when: ansible_os_family == "RedHat"
-
 # lockfile-{create,touch} is used to ensure backup is accessed by only
 # one process
 - name: packages install
@@ -33,20 +28,6 @@
       }
 
 - block:
-  - name: cronie
-    package:
-      name:
-        - cronie
-        - rclone
-
-  - name: cronie service
-    service:
-      name: crond
-      state: started
-      enabled: true
-  when: ansible_os_family == "RedHat"
-
-- block:
   - name: cron
     package:
       name:
@@ -58,7 +39,6 @@
       name: cron
       state: started
       enabled: true
-  when: ansible_os_family == "Debian"
 
 - name: restic repositories
   file:
@@ -125,12 +105,8 @@
 
 - name: restic prune · cron
   when: restic_prune_crontab is defined
-  copy:
+  template:
+    src: restic-prune-crontab
     dest: /etc/cron.d/restic-{{ restic_name }}-prune
     mode: u=rw,g=r,o=r
-    content: |
-      MAILTO={{ restic_email_to | quote }}
-      MAILFROM={{ restic_email_from | quote }}
-      PATH=/usr/bin:/bin:/usr/sbin:/sbin:{{ restic_bin_dir | quote }}
-
-      {{ restic_prune_crontab }} root /usr/local/bin/restic-{{ restic_name | quote }}-prune 2>&1 | tee -a {{ restic_log_dir|quote }}
+      

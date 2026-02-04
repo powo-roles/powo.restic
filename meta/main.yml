@@ -3,20 +3,7 @@ galaxy_info:
   author: Laurent Almeras
   description: Restic installation.
   license: BSD
-  min_ansible_version: 2.4
-  platforms:
-    - name: EL
-      versions:
-        - 7
-    - name: Fedora
-      versions:
-        - 26
-        - 27
-        - 28
-    - name: Ubuntu
-        - xenial
-        - artful
-        - bionic
+  min_ansible_version: "2.18"
   galaxy_tags:
     - powo
     - system

@@ -1,0 +1,5 @@
+MAILTO={{ restic_email_to | quote }}
+MAILFROM={{ restic_email_from | quote }}
+PATH=/usr/bin:/bin:/usr/sbin:/sbin:{{ restic_bin_dir | quote }}
+
+{{ restic_prune_crontab }} root /usr/local/bin/restic-{{ restic_name | quote }}-prune 2>&1 | tee -a {{ restic_log_dir|quote }}
