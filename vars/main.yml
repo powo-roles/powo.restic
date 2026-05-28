@@ -1,7 +1,7 @@
 ---
 restic_script_template: restic-flock
 
-restic_utils_packages: "{{ _restic_utils_packages | distro(vars) }}"
+restic_utils_packages: "{{ lookup('distro', _restic_utils_packages) }}"
 
 _restic_utils_packages:
   CentOS_7:
